@@ -22,6 +22,7 @@ jobs:
           echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
           echo "draft: ${{ steps.last_release.outputs.draft }}"
           echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
+          echo "upload_url: ${{ steps.last_release.outputs.upload_url }}"
       - name: "Assert"
         run: |
           if [[ "${{ steps.last_release.outputs.id }}" == "" ]];
@@ -64,6 +65,7 @@ jobs:
           echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
           echo "draft: ${{ steps.last_release.outputs.draft }}"
           echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
+          echo "upload_url: ${{ steps.last_release.outputs.upload_url }}"
       - name: "Assert"
         run: |
           if [[ "${{ steps.last_release.outputs.id }}" == "" ]];
@@ -105,6 +107,7 @@ jobs:
           echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
           echo "draft: ${{ steps.last_release.outputs.draft }}"
           echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
+          echo "upload_url: ${{ steps.last_release.outputs.upload_url }}"
       - name: "Assert"
         run: |
           if [[ "${{ steps.last_release.outputs.id }}" == "" ]];
@@ -148,6 +151,7 @@ jobs:
           echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
           echo "draft: ${{ steps.last_release.outputs.draft }}"
           echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
+          echo "upload_url: ${{ steps.last_release.outputs.upload_url }}"
       - name: "Assert"
         run: |
           if [[ "${{ steps.last_release.outputs.id }}" != "" ]];
