@@ -1,4 +1,4 @@
-name: "Get latest release of repository"
+name: "Get latest release with filter"
 
 description: "Get latest release including draft and prerelease. Return information about release"
 inputs:
