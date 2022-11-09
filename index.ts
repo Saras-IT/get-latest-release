@@ -46,7 +46,7 @@ async function run(): Promise<void> {
  * Setup action output values
  * @param release - founded release
  */
-function setOutput(release: { id: number, tag_name: string, created_at: string, draft: boolean, prerelease: boolean }): void {
+function setOutput(release: { id: number, tag_name: string, created_at: string, draft: boolean, prerelease: boolean,upload_url: string }): void {
     core.setOutput('id', release.id);
     core.setOutput('name', release.id);
     core.setOutput('tag_name', release.tag_name);
@@ -54,6 +54,7 @@ function setOutput(release: { id: number, tag_name: string, created_at: string, 
     core.setOutput('draft', release.draft);
     core.setOutput('prerelease', release.prerelease);
     core.setOutput('release', !release.prerelease && !release.draft);
+    core.setOutput('upload_url', release.upload_url);
 }
 
 /**
