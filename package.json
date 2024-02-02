@@ -1,5 +1,5 @@
 {
-  "name": "get-latest-release",
+  "name": "gha-get-latest-release",
   "version": "1.0.0",
   "description": "Get latest release of Github Repo, includes draft release",
   "main": "dist/index.js",

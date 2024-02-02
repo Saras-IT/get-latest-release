@@ -7,7 +7,7 @@ async function run(): Promise<void> {
     let repo_name = core.getInput('repo');
     const repository = core.getInput('repository');
     const myToken = core.getInput('token');
-    const excludeReleaseTypes = core.getInput('exclude_types').split(',');
+    const excludeReleaseTypes = core.getInput('excludes').split(',');
     const topList = core.getInput('view_top');
     const filterTag = core.getInput('filter');
     // Set parameters
