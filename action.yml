@@ -1,7 +1,7 @@
 name: "Get latest release with filter"
 description: "Get latest release including draft and prerelease. Return information about release"
 inputs:
-    owner:
+  owner:
     description: "The Github user or org that owns the repo. Default will be current owner."
     required: false
   repo:
