@@ -1,15 +1,14 @@
 name: "Get latest release with filter"
-
 description: "Get latest release including draft and prerelease. Return information about release"
 inputs:
     owner:
-    description: 'The Github user or org that owns the repo. Default will be current owner.'
+    description: "The Github user or org that owns the repo. Default will be current owner."
     required: false
   repo:
-    description: 'The repo name. Default will be current repo'
+    description: "The repo name. Default will be current repo"
     required: false
   repository:
-    description: 'The repo name with org. E.g. myOrg/myRepo. Default will be current org/repo.'
+    description: "The repo name with org. E.g. myOrg/myRepo. Default will be current org/repo."
     required: false
   token:
     description: "GitHub Token"
@@ -26,26 +25,26 @@ inputs:
     default: "100"
 outputs:
   id:
-    description: 'Id of the release'
+    description: "Id of the release"
   name:
-    description: 'Name of the release'
+    description: "Name of the release"
   tag_name:
-    description: 'Tag of the release'
+    description: "Tag of the release"
   version:
-    description: 'Version of the release, without v prefix'
+    description: "Version of the release, without v prefix"
   created_at:
-    description: 'Creation date of the release'
+    description: "Creation date of the release"
   draft:
-    description: 'Release is draft'
+    description: "Release is draft"
   prerelease:
-    description: 'Release is prerelease'
+    description: "Release is prerelease"
   release:
-    description: 'Release is production release'
+    description: "Release is production release"
   upload_url:
-    description: 'Release upload url'
+    description: "Release upload url"
 runs:
   using: "node20"
   main: "dist/index.js"
 branding:
-  icon: 'tag'
-  color: 'purple'
+  icon: "tag"
+  color: "purple"
