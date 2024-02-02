@@ -1,5 +1,5 @@
 {
-  "name": "gha-get-latest-release",
+  "name": "get-repo-release",
   "version": "1.0.0",
   "description": "Get latest release of Github Repo, includes draft release",
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Saras-IT/get-latest-release.git"
+    "url": "git+https://github.com/Saras-IT/get-repo-release.git"
   },
   "keywords": [
     "github-actions",
@@ -19,9 +19,9 @@
   "author": "Saras IT",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/Saras-IT/get-latest-release/issues"
+    "url": "https://github.com/Saras-IT/get-repo-release/issues"
   },
-  "homepage": "https://github.com/Saras-IT/get-latest-release#readme",
+  "homepage": "https://github.com/Saras-IT/get-repo-release#readme",
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",

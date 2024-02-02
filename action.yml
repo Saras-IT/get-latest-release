@@ -1,4 +1,4 @@
-name: "Get latest release with filter"
+name: "Get Github Repo release info"
 description: "Get latest release including draft and prerelease. Return information about release"
 inputs:
   owner:

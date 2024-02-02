@@ -1,4 +1,4 @@
-# get-latest-release
+# get-repo-release
 Get latest release including draft and prerelease. Return information about release.
 
 <em>Difference to other actions which returns latest release is that, this action get access to hiden draft releases.</em>
@@ -49,7 +49,7 @@ steps:
   - uses: actions/checkout@v4
   - name: "call action"
     id: last_release
-    uses: Saras-IT/get-latest-release@v1
+    uses: Saras-IT/get-repo-release@v1
     with:
       # The Github user or org that owns the repo. Default will be current owner.
       owner: ''
