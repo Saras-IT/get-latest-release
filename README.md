@@ -11,7 +11,7 @@ Get latest release of Github Repo including draft and prerelease. Return informa
 
 ### `excludes`
 
-Exclude some types of releases separated by `|`. Examples: `draft,prerelease`, `prerelease,release`, `draft`
+Exclude some types of releases separated by `,`. Examples: `draft,prerelease`, `prerelease,release`, `draft`
 
 ### `view_top`
 
