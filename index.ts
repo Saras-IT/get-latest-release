@@ -29,7 +29,7 @@ async function run(): Promise<void> {
         let releaseList = await octokit.repos.listReleases({
             repo: repo_name,
             owner: repo_owner,
-            per_page: topList,
+            per_page: Number(topList),
             page: 1
         });
 
@@ -95,9 +95,9 @@ function setOutput(release: { id: number, tag_name: string, created_at: string, 
  * Write debug
  * @param release - founded release
  */
-function WriteDebug(release: { id: number, tag_name: string, created_at: string, draft: boolean, prerelease: boolean, name: string }): void {
+function WriteDebug(release: Record<string, unknown>): void {
     core.debug(`id: ${release.id}`);
-    core.debug(`name: ${release.name}`)
+    core.debug(`title: ${release.title}`)
     core.debug(`tag_name: ${release.tag_name}`);
     core.debug(`created_at: ${release.created_at}`);
     core.debug(`draft: ${release.draft}`);
