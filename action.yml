@@ -2,11 +2,23 @@ name: "Get latest release with filter"
 
 description: "Get latest release including draft and prerelease. Return information about release"
 inputs:
-  myToken:
+    owner:
+    description: 'The Github user or org that owns the repo. Default will be current owner.'
+    required: false
+  repo:
+    description: 'The repo name. Default will be current repo'
+    required: false
+  repository:
+    description: 'The repo name with org. E.g. myOrg/myRepo. Default will be current org/repo.'
+    required: false
+  token:
     description: "GitHub Token"
     required: true
-  exclude_types:
-    description: "Exclude release type (example: draft|prerelease)"
+  filter:
+    description: "Filter release tag.Use regex pattern like v16*"
+    required: false
+  excludes:
+    description: "Types of releases to exclude (e.g. draft,prerelease).Comma seperated list."
     required: false
   view_top:
     description: "View top releases to find release"
@@ -32,7 +44,7 @@ outputs:
   upload_url:
     description: 'Release upload url'
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
 branding:
   icon: 'tag'

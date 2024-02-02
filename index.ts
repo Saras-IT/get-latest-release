@@ -3,41 +3,74 @@ import * as github from '@actions/github'
 
 async function run(): Promise<void> {
     // Get input values
-    const myToken = core.getInput('myToken');
-    const excludeReleaseTypes = core.getInput('exclude_types').split('|');
-    const topList = +core.getInput('view_top');
-
+    let repo_owner = core.getInput('owner');
+    let repo_name = core.getInput('repo');
+    const repository = core.getInput('repository');
+    const myToken = core.getInput('token');
+    const excludeReleaseTypes = core.getInput('exclude_types').split(',');
+    const topList = core.getInput('view_top');
+    const filterTag = core.getInput('filter');
     // Set parameters
     const excludeDraft = excludeReleaseTypes.some(f => f === "draft");
     const excludePrerelease = excludeReleaseTypes.some(f => f === "prerelease");
     const excludeRelease = excludeReleaseTypes.some(f => f === "release");
 
-    const octokit = github.getOctokit(myToken);
+    if (repository) {
+        [repo_owner, repo_name] = repository.split("/");
+      }
+      if (!repo_name && !repo_name) {
+        repo_name = github.context.repo.repo;
+        repo_owner = github.context.repo.owner;
+      }
+    try {
+        const octokit = github.getOctokit(myToken);
 
-    // Load release list from GitHub
-    let releaseList = await octokit.repos.listReleases({
-        repo: github.context.repo.repo,
-        owner: github.context.repo.owner,
-        per_page: topList,
-        page: 1
-    });
+        // Load release list from GitHub
+        let releaseList = await octokit.repos.listReleases({
+            repo: repo_name,
+            owner: repo_owner,
+            per_page: topList,
+            page: 1
+        });
 
-    // Search release list for latest required release
-    if (core.isDebug()) {
-        core.debug(`Found ${releaseList.data.length} releases`);
-        releaseList.data.forEach((el) => WriteDebug(el));
-    }
-
-    for (let i = 0; i < releaseList.data.length; i++) {
-        let releaseListElement = releaseList.data[i];
-
-        if ((!excludeDraft && releaseListElement.draft) ||
-            (!excludePrerelease && releaseListElement.prerelease) ||
-            (!excludeRelease && !releaseListElement.prerelease && !releaseListElement.draft)) {
-            core.debug(`Chosen: ${releaseListElement.id}`);
-            setOutput(releaseListElement);
-            break;
+        if (core.isDebug()) {
+            core.debug(`Found total ${releaseList.data.length} releases without filter`);
+            releaseList.data.forEach(el => WriteDebug(el));
         }
+
+        let releaseListOut = releaseList.data;
+        if (excludeReleaseTypes.includes("prerelease")) {
+        releaseListOut = releaseListOut.filter(x => x.prerelease != true);
+        }
+        if (excludeReleaseTypes.includes("draft")) {
+        releaseListOut = releaseListOut.filter(x => x.draft != true);
+        }
+
+        if (filterTag) {
+        const regex = new RegExp(filterTag, "g");
+        releaseListOut = releaseListOut.filter(function (el) {
+            return regex.test(el.tag_name);
+        });
+        }
+
+        // Search release list for latest required release
+        if (core.isDebug()) {
+            core.debug(`Found ${releaseList.data.length} releases`);
+            releaseList.data.forEach((el) => WriteDebug(el));
+        }
+
+        if (releaseListOut.length) {
+            const releaseListElement = releaseListOut[0];
+            if (core.isDebug()) {
+            core.debug(`Chosen: ${releaseListElement.name}`);
+            }
+            setOutput(releaseListElement);
+        } else {
+            core.setFailed("No valid releases");
+        }
+    } catch (err: unknown) {
+      if (err instanceof Error) core.error(err.message);
+      core.error(String(err));
     }
 }
 

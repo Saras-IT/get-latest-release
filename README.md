@@ -46,13 +46,25 @@ Founded release prerelease type flag (boolean: `true`, `false`).
 ## Example usage
 ```yaml
 steps:
-  - uses: actions/checkout@v1
+  - uses: actions/checkout@v4
   - name: "call action"
     id: last_release
-    uses: InsonusK/get-latest-release@v1.0.1
+    uses: Saras-IT/get-latest-release@v1
     with:
-      myToken: ${{ github.token }}
+      # The Github user or org that owns the repo. Default will be current owner.
+      owner: ''
+      # The repo name. Default will be current repo
+      repo: ''
+      # The repo name with org. E.g. myOrg/myRepo. Default will be current org/repo.
+      repository: ''
+      # GitHub Token
+      token: ${{ github.token }}
+      # Filter release tag.Use regex pattern like v16*
+      filter: 'v2-*'
+      # Types of releases to exclude (e.g. draft,prerelease).Comma seperated list.
       exclude_types: "release"
+      # View top releases to find release
+      # Default: 100
       view_top: 1
   - name: "Print result"
     run: |
