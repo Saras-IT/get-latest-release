@@ -40,10 +40,14 @@ async function run(): Promise<void> {
 
         let releaseListOut = releaseList.data;
         if (excludeReleaseTypes.includes("prerelease")) {
-        releaseListOut = releaseListOut.filter(x => x.prerelease != true);
+        releaseListOut = releaseListOut.filter(x => !x.prerelease);
         }
         if (excludeReleaseTypes.includes("draft")) {
-        releaseListOut = releaseListOut.filter(x => x.draft != true);
+        releaseListOut = releaseListOut.filter(x => !x.draft);
+        }
+
+        if (excludeReleaseTypes.includes("release")) {
+            releaseListOut = releaseListOut.filter(x => x.draft || x.prerelease);
         }
 
         if (filterTag) {
@@ -97,7 +101,7 @@ function setOutput(release: { id: number, tag_name: string, created_at: string, 
  */
 function WriteDebug(release: Record<string, unknown>): void {
     core.debug(`id: ${release.id}`);
-    core.debug(`title: ${release.title}`)
+    core.debug(`name: ${release.name}`)
     core.debug(`tag_name: ${release.tag_name}`);
     core.debug(`created_at: ${release.created_at}`);
     core.debug(`draft: ${release.draft}`);
