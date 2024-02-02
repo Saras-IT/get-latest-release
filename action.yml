@@ -1,5 +1,5 @@
 name: "Get Github Repo release info"
-description: "Get latest release including draft and prerelease. Return information about release"
+description: "Get release info of a Github Repo including draft and prerelease. Return information about release"
 inputs:
   owner:
     description: "The Github user or org that owns the repo. Default will be current owner."
