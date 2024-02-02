@@ -1,17 +1,17 @@
 # get-repo-release
-Get latest release including draft and prerelease. Return information about release.
+Get latest release of Github Repo including draft and prerelease. Return information about release.
 
 <em>Difference to other actions which returns latest release is that, this action get access to hiden draft releases.</em>
 
 ## Inputs
 
-### `myToken`
+### `token`
 
 **Required** Token to github repository to get access to hidden releases (draft releases)
 
-### `exclude_types`
+### `excludes`
 
-Exclude some types of releases separated by `|`. Examples: `draft|prerelease`, `prerelease|release`, `draft`
+Exclude some types of releases separated by `|`. Examples: `draft,prerelease`, `prerelease,release`, `draft`
 
 ### `view_top`
 
@@ -62,7 +62,7 @@ steps:
       # Filter release tag.Use regex pattern like v16*
       filter: 'v2-*'
       # Types of releases to exclude (e.g. draft,prerelease).Comma seperated list.
-      exclude_types: "release"
+      excludes: "release"
       # View top releases to find release
       # Default: 100
       view_top: 1
@@ -74,4 +74,5 @@ steps:
       echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
       echo "draft: ${{ steps.last_release.outputs.draft }}"
       echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
+      echo "release: ${{ steps.last_release.outputs.release }}"
 ```
