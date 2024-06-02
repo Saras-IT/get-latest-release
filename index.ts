@@ -12,11 +12,11 @@ interface Release {
 }
 
 
-async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, excludeReleaseTypes: string, tagPattern?: string): Promise<Release | null> {
+async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, excludeReleaseTypes?: string, tagPattern?: string): Promise<Release | null> {
     let page = 0;
     let releasesFinal: Release[] = [];
     const regex = tagPattern ? new RegExp(tagPattern) : null;
-    const excludeTypes = excludeReleaseTypes.split(',');
+    const excludeTypes = excludeReleaseTypes ? excludeReleaseTypes.split(',') : [];
 
     while (true) {
         const response = await octokit.rest.repos.listReleases({
@@ -127,7 +127,7 @@ async function run(): Promise<void> {
     }
     try {
         const octokit = github.getOctokit(myToken);
-        getLastReleaseByTagPattern(octokit, repo_owner, repo_name, filterTag, excludeRelease) // Pass 'prerelease', 'draft', or both to exclude those types
+        getLastReleaseByTagPattern(octokit, repo_owner, repo_name, excludeRelease,filterTag) // Pass 'prerelease', 'draft', or both to exclude those types
             .then(release => {
                 if (release) {
                     if (core.isDebug()) {
