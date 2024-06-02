@@ -61,11 +61,8 @@ steps:
       token: ${{ github.token }}
       # Filter release tag.Use regex pattern like v16*
       filter: 'v2-*'
-      # Types of releases to exclude (e.g. draft,prerelease).Comma seperated list.
+      # Types of releases to exclude (e.g. draft,prerelease,release).Comma seperated list.
       excludes: "release"
-      # View top releases to find release
-      # Default: 100
-      view_top: 1
   - name: "Print result"
     run: |
       echo "id: ${{ steps.last_release.outputs.id }}"
