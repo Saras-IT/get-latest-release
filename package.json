@@ -1,6 +1,6 @@
 {
   "name": "get-repo-release",
-  "version": "v1.6",
+  "version": "v1.7",
   "description": "Get latest release of Github Repo, includes draft release",
   "main": "dist/index.js",
   "scripts": {
