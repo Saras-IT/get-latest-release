@@ -38,14 +38,42 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
             }
             let exclude = false;
             if (excludeTypes.includes('prerelease') && release.prerelease) exclude = true;
+            if (core.isDebug()) {
+                if (exclude) {
+                    core.debug('...exclude prerelease');
+                } else {
+                    core.debug('...NOT exclude prerelease');
+                }
+            }
             if (!exclude && excludeTypes.includes('draft') && release.draft) exclude = true;
+            if (core.isDebug()) {
+                if (exclude) {
+                    core.debug('...exclude draft');
+                } else {
+                    core.debug('...NOT exclude draft');
+                }
+            }
             if (!exclude && excludeTypes.includes('release') && !release.prerelease && !release.draft) exclude = true;
+            if (core.isDebug()) {
+                if (exclude) {
+                    core.debug('...exclude release');
+                } else {
+                    core.debug('...NOT exclude release');
+                }
+            }
             if (!exclude && regex && !regex.test(release.tag_name)) exclude = true;
             if (core.isDebug()) {
                 if (exclude) {
-                    core.debug('...exclude');
+                    core.debug('...exclude pattern');
                 } else {
-                    core.debug('...NOT exclude');
+                    core.debug('...NOT exclude pattern');
+                }
+            }
+            if (core.isDebug()) {
+                if (exclude) {
+                    core.debug('...exclude record');
+                } else {
+                    core.debug('...NOT exclude record');
                 }
             }
             return !exclude;
