@@ -17,7 +17,7 @@ inputs:
     description: "Filter release tag.Use regex pattern like v16*"
     required: false
   excludes:
-    description: "Types of releases to exclude (e.g. draft,prerelease).Comma seperated list."
+    description: "Types of releases to exclude (e.g. draft,prerelease,release).Comma seperated list."
     required: false
 outputs:
   id:
