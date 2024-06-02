@@ -54,10 +54,14 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
 
         page++;
     }
-
+    if (core.isDebug()) {
+        core.debug(`Final releases: ${JSON.stringify(releasesFinal, null, 2)}`);
+    }
     // Sort releases by created_at in descending order and return the most recent one
     releasesFinal.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
+    if (core.isDebug()) {
+        core.debug(`Final releases (date sort): ${JSON.stringify(releasesFinal, null, 2)}`);
+    }
     if (releasesFinal.length > 0) {
         return releasesFinal[0];
     } else {
