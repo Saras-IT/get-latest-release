@@ -12,10 +12,10 @@ interface Release {
 }
 
 
-async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, tagPattern: string, excludeReleaseTypes: string) {
+async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, excludeReleaseTypes: string,tagPattern?: string): Promise<Release | null> {
     let page = 1;
     let releases: Release[] = [];
-    const regex = new RegExp(tagPattern);
+    const regex = tagPattern ? new RegExp(tagPattern) : null;
     const excludeTypes = excludeReleaseTypes.split(',');
 
     while (true) {
@@ -33,7 +33,8 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
             let exclude = false;
             if (excludeTypes.includes('prerelease') && release.prerelease) exclude = true;
             if (excludeTypes.includes('draft') && release.draft) exclude = true;
-            return !exclude && regex.test(release.tag_name);
+            if (regex && !regex.test(release.tag_name)) exclude = true;
+            return !exclude;
         });
 
         // Add the filtered releases to the overall list of matching releases
@@ -75,12 +76,14 @@ async function run(): Promise<void> {
         const octokit = github.getOctokit(myToken);
         getLastReleaseByTagPattern(octokit, repo_owner, repo_name, filterTag, excludeRelease) // Pass 'prerelease', 'draft', or both to exclude those types
             .then(release => {
-                if (core.isDebug()) {
-                    console.log(`Most recent release matching the criteria:`);
-                    console.log(`${release.name} with tag: ${release.tag_name}, created at: ${release.created_at}`);
+                if (release) {
+                    if (core.isDebug()) {
+                        console.log(`Most recent release matching the criteria:`);
+                        console.log(`${release.name} with tag: ${release.tag_name}, created at: ${release.created_at}`);
+                    }
+                    setOutput(release);
                 }
-                setOutput(release);
-            })
+                })
             .catch(error => {
                 console.error(error.message);
                 core.setFailed(error.message);
