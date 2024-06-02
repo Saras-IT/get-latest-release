@@ -12,8 +12,8 @@ interface Release {
 }
 
 
-async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, excludeReleaseTypes: string,tagPattern?: string): Promise<Release | null> {
-    let page = 1;
+async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, excludeReleaseTypes: string, tagPattern?: string): Promise<Release | null> {
+    let page = 0;
     let releases: Release[] = [];
     const regex = tagPattern ? new RegExp(tagPattern) : null;
     const excludeTypes = excludeReleaseTypes.split(',');
@@ -28,6 +28,9 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
 
         releases = response.data as Release[];
 
+        if (core.isDebug()) {
+            core.debug(`Releases: ${JSON.stringify(releases, null, 2)}`);
+        }
         // Filter releases based on the exclusion criteria and tag matching the specified regex pattern
         const filteredReleases = releases.filter(release => {
             let exclude = false;
@@ -40,6 +43,10 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
 
         // Add the filtered releases to the overall list of matching releases
         releases = releases.concat(filteredReleases);
+
+        if (core.isDebug()) {
+            core.debug(`Filtered releases: ${JSON.stringify(releases, null, 2)}`);
+        }
 
         if (releases.length === 0) {
             break;
@@ -84,7 +91,7 @@ async function run(): Promise<void> {
                     }
                     setOutput(release);
                 }
-                })
+            })
             .catch(error => {
                 console.error(error.message);
                 core.setFailed(error.message);
