@@ -28,81 +28,21 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
 
         let releases = response.data as Release[];
 
-        if (core.isDebug()) {
-            core.debug(`Releases: ${JSON.stringify(releases, null, 2)}`);
-        }
         // Filter releases based on the exclusion criteria and tag matching the specified regex pattern
         const filteredReleases = releases.filter(release => {
             if (core.isDebug()) {
                 core.debug(`release -- Inner Loop: ${JSON.stringify(release, null, 2)}`);
             }
-            let exclude = false;
-            if (excludeTypes.includes('prerelease') && release.prerelease) {
-                exclude = true;
-                if (core.isDebug()) {
-                    if (exclude) {
-                        core.debug('...exclude prerelease');
-                    } else {
-                        core.debug('...NOT exclude prerelease');
-                    }
-                }
-                return false;
-            }
-
-            if (excludeTypes.includes('draft') && release.draft) {
-                exclude = true;
-                if (core.isDebug()) {
-                    if (exclude) {
-                        core.debug('...exclude draft');
-                    } else {
-                        core.debug('...NOT exclude draft');
-                    }
-                }
-                return false;
-            }
-            if (excludeTypes.includes('release') && !release.prerelease && !release.draft) {
-                exclude = true;
-
-                if (core.isDebug()) {
-                    if (exclude) {
-                        core.debug('...exclude release');
-                    } else {
-                        core.debug('...NOT exclude release');
-                    }
-                }
-                return false;
-            }
-            if (regex && !regex.test(release.tag_name)) {
-                exclude = true;
-
-                if (core.isDebug()) {
-                    if (exclude) {
-                        core.debug('...exclude pattern');
-                    } else {
-                        core.debug('...NOT exclude pattern');
-                    }
-                }
-                return false;
-            }
-            if (core.isDebug()) {
-                if (exclude) {
-                    core.debug('...exclude record');
-                } else {
-                    core.debug('...NOT exclude record');
-                }
-            }
+            if (excludeTypes.includes('prerelease') && release.prerelease) return false;
+            if (excludeTypes.includes('draft') && release.draft) return false;
+            if (excludeTypes.includes('release') && !release.prerelease && !release.draft) return false;
+            if (regex && !regex.test(release.tag_name)) return false;
             return true;
 
         });
 
-        if (core.isDebug()) {
-            core.debug(`Filtered releases: ${JSON.stringify(filteredReleases, null, 2)}`);
-        }
         // Add the filtered releases to the overall list of matching releases
         releasesFinal = releasesFinal.concat(filteredReleases);
-        if (core.isDebug()) {
-            core.debug(`Final releases -- In Loop: ${JSON.stringify(releasesFinal, null, 2)}`);
-        }
 
         if (releases.length === 0) {
             break;
@@ -110,13 +50,10 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
 
         page++;
     }
-    if (core.isDebug()) {
-        core.debug(`Final releases: ${JSON.stringify(releasesFinal, null, 2)}`);
-    }
     // Sort releases by created_at in descending order and return the most recent one
     releasesFinal.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     if (core.isDebug()) {
-        core.debug(`Final releases (date sort): ${JSON.stringify(releasesFinal, null, 2)}`);
+        core.debug(`Final releases: ${JSON.stringify(releasesFinal, null, 2)}`);
     }
     if (releasesFinal.length > 0) {
         return releasesFinal[0];
@@ -148,6 +85,7 @@ async function run(): Promise<void> {
                     if (core.isDebug()) {
                         console.log(`Most recent release matching the criteria:`);
                         console.log(`${release.name} with tag: ${release.tag_name}, created at: ${release.created_at}`);
+                        WriteDebug(release);
                     }
                     setOutput(release);
                 }
@@ -183,7 +121,7 @@ function setOutput(release: Release): void {
  * Write debug
  * @param release - founded release
  */
-function WriteDebug(release: Record<string, unknown>): void {
+function WriteDebug(release: Release): void {
     core.debug(`id: ${release.id}`);
     core.debug(`name: ${release.name}`)
     core.debug(`tag_name: ${release.tag_name}`);
