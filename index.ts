@@ -43,7 +43,9 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
 
         // Add the filtered releases to the overall list of matching releases
         releasesFinal = releasesFinal.concat(filteredReleases);
-
+        if (core.isDebug()) {
+            core.debug(`Final releases -- In Loop: ${JSON.stringify(releasesFinal, null, 2)}`);
+        }
         if (core.isDebug()) {
             core.debug(`Filtered releases: ${JSON.stringify(releases, null, 2)}`);
         }
