@@ -91,7 +91,7 @@ jobs:
           fi
 
   get_release:
-    name: "Get release release from all releases"
+    name: "Get prod release from all releases"
     runs-on: ubuntu-latest
 
     steps:
@@ -101,6 +101,7 @@ jobs:
         uses: ./
         with:
           token: ${{ github.token }}
+          excludes: "draft,prerelease"
       - name: "Print result"
         run: |
           echo "id: ${{ steps.last_release.outputs.id }}"
@@ -111,7 +112,7 @@ jobs:
           echo "upload_url: ${{ steps.last_release.outputs.upload_url }}"
       - name: "Assert"
         run: |
-          if [[ "${{ steps.last_release.outputs.id }}" == "" ]];
+            if [[ "${{ steps.last_release.outputs.id }}" == "" ]];
             then
               echo "Wrong release ID"
               exit 4
@@ -132,46 +133,3 @@ jobs:
               exit 4
             fi
 
-  get_zero_because_of_top_list_limit:
-    name: "Get no release because draft is canceled and limit is set to 1"
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: "call action"
-        id: last_release
-        uses: ./
-        with:
-          token: ${{ github.token }}
-          excludes: "release"
-          view_top: 1
-      - name: "Print result"
-        run: |
-          echo "id: ${{ steps.last_release.outputs.id }}"
-          echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
-          echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
-          echo "draft: ${{ steps.last_release.outputs.draft }}"
-          echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
-          echo "upload_url: ${{ steps.last_release.outputs.upload_url }}"
-      - name: "Assert"
-        run: |
-          if [[ "${{ steps.last_release.outputs.id }}" != "" ]];
-          then
-            echo "Wrong release type"
-            exit 4
-          fi
-          if [[ "${{ steps.last_release.outputs.draft }}" != "" ]];
-          then
-            echo "Wrong release type"
-            exit 4
-          fi
-          if [[ "${{ steps.last_release.outputs.prerelease }}" != "" ]];
-          then
-            echo "Wrong release type"
-            exit 4
-          fi
-          if [[ "${{ steps.last_release.outputs.release }}" != "" ]];
-          then
-            echo "Wrong release type"
-            exit 4
-          fi

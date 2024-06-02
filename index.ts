@@ -38,9 +38,9 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
             }
             let exclude = false;
             if (excludeTypes.includes('prerelease') && release.prerelease) exclude = true;
-            if (excludeTypes.includes('draft') && release.draft) exclude = true;
-            if (excludeTypes.includes('release') && !release.prerelease && !release.draft) exclude = true;
-            if (regex && !regex.test(release.tag_name)) exclude = true;
+            if (!exclude && excludeTypes.includes('draft') && release.draft) exclude = true;
+            if (!exclude && excludeTypes.includes('release') && !release.prerelease && !release.draft) exclude = true;
+            if (!exclude && regex && !regex.test(release.tag_name)) exclude = true;
             if (core.isDebug()) {
                 if (exclude) {
                     core.debug('...exclude');
