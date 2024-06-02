@@ -14,7 +14,7 @@ interface Release {
 
 async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, excludeReleaseTypes: string, tagPattern?: string): Promise<Release | null> {
     let page = 0;
-    let releases: Release[] = [];
+    let releasesFinal: Release[] = [];
     const regex = tagPattern ? new RegExp(tagPattern) : null;
     const excludeTypes = excludeReleaseTypes.split(',');
 
@@ -26,7 +26,7 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
             page,
         });
 
-        releases = response.data as Release[];
+        let releases = response.data as Release[];
 
         if (core.isDebug()) {
             core.debug(`Releases: ${JSON.stringify(releases, null, 2)}`);
@@ -42,7 +42,7 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
         });
 
         // Add the filtered releases to the overall list of matching releases
-        releases = releases.concat(filteredReleases);
+        releasesFinal = releasesFinal.concat(filteredReleases);
 
         if (core.isDebug()) {
             core.debug(`Filtered releases: ${JSON.stringify(releases, null, 2)}`);
@@ -56,10 +56,10 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
     }
 
     // Sort releases by created_at in descending order and return the most recent one
-    releases.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    releasesFinal.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-    if (releases.length > 0) {
-        return releases[0];
+    if (releasesFinal.length > 0) {
+        return releasesFinal[0];
     } else {
         throw new Error('No matching releases found');
     }
