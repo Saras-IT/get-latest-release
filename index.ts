@@ -1,80 +1,93 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
+interface Release {
+    id: string;
+    tag_name: string;
+    prerelease: boolean;
+    draft: boolean;
+    created_at: string;
+    name: string;
+    upload_url: string;
+}
+
+
+async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: string, tagPattern: string, excludeReleaseTypes: string) {
+    let page = 1;
+    let releases: Release[] = [];
+    const regex = new RegExp(tagPattern);
+    const excludeTypes = excludeReleaseTypes.split(',');
+
+    while (true) {
+        const response = await octokit.rest.repos.listReleases({
+            owner,
+            repo,
+            per_page: 100, // Adjust the number of items per page as needed
+            page,
+        });
+
+        releases = response.data as Release[];
+
+        // Filter releases based on the exclusion criteria and tag matching the specified regex pattern
+        const filteredReleases = releases.filter(release => {
+            let exclude = false;
+            if (excludeTypes.includes('prerelease') && release.prerelease) exclude = true;
+            if (excludeTypes.includes('draft') && release.draft) exclude = true;
+            return !exclude && regex.test(release.tag_name);
+        });
+
+        // Add the filtered releases to the overall list of matching releases
+        releases = releases.concat(filteredReleases);
+
+        if (releases.length === 0) {
+            break;
+        }
+
+        page++;
+    }
+
+    // Sort releases by created_at in descending order and return the most recent one
+    releases.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    if (releases.length > 0) {
+        return releases[0];
+    } else {
+        throw new Error('No matching releases found');
+    }
+}
 async function run(): Promise<void> {
     // Get input values
     let repo_owner = core.getInput('owner');
     let repo_name = core.getInput('repo');
     const repository = core.getInput('repository');
     const myToken = core.getInput('token');
+    const excludeRelease = core.getInput('excludes')
     const excludeReleaseTypes = core.getInput('excludes').split(',');
-    const topList = core.getInput('view_top');
     const filterTag = core.getInput('filter');
-    // Set parameters
-    const excludeDraft = excludeReleaseTypes.some(f => f === "draft");
-    const excludePrerelease = excludeReleaseTypes.some(f => f === "prerelease");
-    const excludeRelease = excludeReleaseTypes.some(f => f === "release");
-
     if (repository) {
         [repo_owner, repo_name] = repository.split("/");
-      }
-      if (!repo_name && !repo_name) {
+    }
+    if (!repo_name && !repo_name) {
         repo_name = github.context.repo.repo;
         repo_owner = github.context.repo.owner;
-      }
+    }
     try {
         const octokit = github.getOctokit(myToken);
-
-        // Load release list from GitHub
-        let releaseList = await octokit.rest.repos.listReleases({
-            repo: repo_name,
-            owner: repo_owner,
-            per_page: Number(topList),
-            page: 1
-        });
-
-        if (core.isDebug()) {
-            core.debug(`Found total ${releaseList.data.length} releases without filter`);
-            releaseList.data.forEach(el => WriteDebug(el));
-        }
-
-        let releaseListOut = releaseList.data;
-        if (excludeReleaseTypes.includes("prerelease")) {
-        releaseListOut = releaseListOut.filter(x => !x.prerelease);
-        }
-        if (excludeReleaseTypes.includes("draft")) {
-        releaseListOut = releaseListOut.filter(x => !x.draft);
-        }
-
-        if (excludeReleaseTypes.includes("release")) {
-            releaseListOut = releaseListOut.filter(x => x.draft || x.prerelease);
-        }
-
-        if (filterTag) {
-        const regex = new RegExp(filterTag, "g");
-        releaseListOut = releaseListOut.filter(function (el) {
-            return regex.test(el.tag_name);
-        });
-        }
-
-        // Search release list for latest required release
-        if (core.isDebug()) {
-            core.debug(`Found ${releaseList.data.length} releases`);
-            releaseList.data.forEach((el) => WriteDebug(el));
-        }
-
-        if (releaseListOut.length) {
-            const releaseListElement = releaseListOut[0];
-            if (core.isDebug()) {
-            core.debug(`Chosen: ${releaseListElement.name}`);
-            }
-            setOutput(releaseListElement);
-        } else {
-            core.setFailed("No valid releases");
-        }
+        getLastReleaseByTagPattern(octokit, repo_owner, repo_name, filterTag, excludeRelease) // Pass 'prerelease', 'draft', or both to exclude those types
+            .then(release => {
+                if (core.isDebug()) {
+                    console.log(`Most recent release matching the criteria:`);
+                    console.log(`${release.name} with tag: ${release.tag_name}, created at: ${release.created_at}`);
+                }
+                setOutput(release);
+            })
+            .catch(error => {
+                console.error(error.message);
+                core.setFailed(error.message);
+            });
     } catch (err: unknown) {
-      if (err instanceof Error) core.error(err.message);
-      core.error(String(err));
+        if (err instanceof Error) core.error(err.message);
+        core.error(String(err));
     }
 }
 
@@ -83,7 +96,7 @@ async function run(): Promise<void> {
  * Setup action output values
  * @param release - founded release
  */
-function setOutput(release: Record<string, unknown>): void {
+function setOutput(release: Release): void {
     core.setOutput('id', release.id);
     core.setOutput('name', release.id);
     core.setOutput('tag_name', release.tag_name);
