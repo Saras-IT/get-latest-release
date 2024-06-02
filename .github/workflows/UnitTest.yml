@@ -6,7 +6,6 @@ jobs:
   get_draft:
     name: "Get draft release from all releases"
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - name: "call action"
@@ -14,7 +13,7 @@ jobs:
         uses: ./
         with:
           token: ${{ github.token }}
-          excludes: "release"
+          excludes: "prerelease,release"
       - name: "Print result"
         run: |
           echo "id: ${{ steps.last_release.outputs.id }}"

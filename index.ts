@@ -37,37 +37,52 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
                 core.debug(`release -- Inner Loop: ${JSON.stringify(release, null, 2)}`);
             }
             let exclude = false;
-            if (excludeTypes.includes('prerelease') && release.prerelease) exclude = true;
-            if (core.isDebug()) {
-                if (exclude) {
-                    core.debug('...exclude prerelease');
-                } else {
-                    core.debug('...NOT exclude prerelease');
+            if (excludeTypes.includes('prerelease') && release.prerelease) {
+                exclude = true;
+                if (core.isDebug()) {
+                    if (exclude) {
+                        core.debug('...exclude prerelease');
+                    } else {
+                        core.debug('...NOT exclude prerelease');
+                    }
                 }
+                return false;
             }
-            if (excludeTypes.includes('draft') && release.draft) exclude = true;
-            if (core.isDebug()) {
-                if (exclude) {
-                    core.debug('...exclude draft');
-                } else {
-                    core.debug('...NOT exclude draft');
+
+            if (excludeTypes.includes('draft') && release.draft) {
+                exclude = true;
+                if (core.isDebug()) {
+                    if (exclude) {
+                        core.debug('...exclude draft');
+                    } else {
+                        core.debug('...NOT exclude draft');
+                    }
                 }
+                return false;
             }
-            if (excludeTypes.includes('release') && !release.prerelease && !release.draft) exclude = true;
-            if (core.isDebug()) {
-                if (exclude) {
-                    core.debug('...exclude release');
-                } else {
-                    core.debug('...NOT exclude release');
+            if (excludeTypes.includes('release') && !release.prerelease && !release.draft) {
+                exclude = true;
+
+                if (core.isDebug()) {
+                    if (exclude) {
+                        core.debug('...exclude release');
+                    } else {
+                        core.debug('...NOT exclude release');
+                    }
                 }
+                return false;
             }
-            if (regex && !regex.test(release.tag_name)) exclude = true;
-            if (core.isDebug()) {
-                if (exclude) {
-                    core.debug('...exclude pattern');
-                } else {
-                    core.debug('...NOT exclude pattern');
+            if (regex && !regex.test(release.tag_name)) {
+                exclude = true;
+
+                if (core.isDebug()) {
+                    if (exclude) {
+                        core.debug('...exclude pattern');
+                    } else {
+                        core.debug('...NOT exclude pattern');
+                    }
                 }
+                return false;
             }
             if (core.isDebug()) {
                 if (exclude) {
@@ -76,7 +91,7 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
                     core.debug('...NOT exclude record');
                 }
             }
-            return !exclude;
+            return true;
 
         });
 
@@ -127,7 +142,7 @@ async function run(): Promise<void> {
     }
     try {
         const octokit = github.getOctokit(myToken);
-        getLastReleaseByTagPattern(octokit, repo_owner, repo_name, excludeRelease,filterTag) // Pass 'prerelease', 'draft', or both to exclude those types
+        getLastReleaseByTagPattern(octokit, repo_owner, repo_name, excludeRelease, filterTag) // Pass 'prerelease', 'draft', or both to exclude those types
             .then(release => {
                 if (release) {
                     if (core.isDebug()) {
