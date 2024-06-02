@@ -33,6 +33,9 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
         }
         // Filter releases based on the exclusion criteria and tag matching the specified regex pattern
         const filteredReleases = releases.filter(release => {
+            if (core.isDebug()) {
+                core.debug(`release -- Inner Loop: ${JSON.stringify(release, null, 2)}`);
+            }
             let exclude = false;
             if (excludeTypes.includes('prerelease') && release.prerelease) exclude = true;
             if (excludeTypes.includes('draft') && release.draft) exclude = true;
@@ -41,13 +44,13 @@ async function getLastReleaseByTagPattern(octokit: any, owner: string, repo: str
             return !exclude;
         });
 
+        if (core.isDebug()) {
+            core.debug(`Filtered releases: ${JSON.stringify(filteredReleases, null, 2)}`);
+        }
         // Add the filtered releases to the overall list of matching releases
         releasesFinal = releasesFinal.concat(filteredReleases);
         if (core.isDebug()) {
             core.debug(`Final releases -- In Loop: ${JSON.stringify(releasesFinal, null, 2)}`);
-        }
-        if (core.isDebug()) {
-            core.debug(`Filtered releases: ${JSON.stringify(releases, null, 2)}`);
         }
 
         if (releases.length === 0) {
